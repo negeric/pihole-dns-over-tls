@@ -1,0 +1,25 @@
+IMAGE_VERSION?=$(shell date +%F)
+PIHOLE_VERSION?=latest
+DEV_VERSION?=latest
+DOCKER_REPO?=negeric
+DOCKER_IMAGE?=pihole-dns-over-tls
+
+.PHONY: image dev
+
+image:
+	DOCKER_REPO=$(DOCKER_REPO) \
+	DOCKER_IMAGE=$(DOCKER_IMAGE) \
+	IMAGE_VERSION=$(IMAGE_VERSION) \
+	PIHOLE_VERSION=$(PIHOLE_VERSION) \
+	docker-compose build base
+	docker tag $(DOCKER_REPO)/$(DOCKER_IMAGE):$(IMAGE_VERSION) \
+		$(DOCKER_REPO)/$(DOCKER_IMAGE):latest
+	docker push $(DOCKER_REPO)/$(DOCKER_IMAGE):$(IMAGE_VERSION)
+	docker push $(DOCKER_REPO)/$(DOCKER_IMAGE):latest
+
+dev:
+	DOCKER_REPO=$(DOCKER_REPO) \
+	DOCKER_IMAGE=$(DOCKER_IMAGE) \
+	IMAGE_VERSION=$(DEV_VERSION) \
+	PIHOLE_VERSION=$(PIHOLE_VERSION) \
+	docker-compose run dev
